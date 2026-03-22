@@ -1,7 +1,6 @@
 # Risk Register — ระบบจัดการกิจกรรมมหาวิทยาลัย
 
-**อัปเดตล่าสุด:** มีนาคม 2026  
-**Owner:** Team Lead
+**อัปเดตล่าสุด:** 22 มีนาคม 2026  
 
 ---
 
@@ -28,7 +27,7 @@
 | **ระดับ** | 🟠 High |
 | **มาตรการป้องกัน** | ตั้งค่า Docker volume สำหรับ persistent storage, ทำ backup schema.sql ไว้ใน repo |
 | **มาตรการแก้ไข** | restore จาก backup, re-run seeds.sql |
-| **Owner** | DevOps |
+| **Owner** | QA / DevOps |
 | **สถานะ** | กำลังดำเนินการ |
 
 ---
@@ -43,7 +42,7 @@
 | **ระดับ** | 🟠 High |
 | **มาตรการป้องกัน** | ใส่ `.env` ใน `.gitignore`, ใช้ `.env.example` เป็น template, ตรวจสอบ pre-commit hook |
 | **มาตรการแก้ไข** | Revoke/rotate JWT_SECRET ทันที, force-push rewrite history หรือ invalidate ทุก token |
-| **Owner** | Team Lead |
+| **Owner** | Scrum Master |
 | **สถานะ** | มีมาตรการป้องกันแล้ว (.gitignore) |
 
 ---
@@ -58,7 +57,7 @@
 | **ระดับ** | 🟠 High |
 | **มาตรการป้องกัน** | Coding Standards กำหนดให้ใช้ parameterized query เสมอ, Code Review Checklist ตรวจ |
 | **มาตรการแก้ไข** | แก้ query ทันที, ตรวจสอบ DB logs, reset credentials |
-| **Owner** | นักพัฒนา Backend |
+| **Owner** | Developer |
 | **สถานะ** | มีมาตรการป้องกันแล้ว (Coding Standards) |
 
 ---
@@ -73,7 +72,7 @@
 | **ระดับ** | 🟡 Medium |
 | **มาตรการป้องกัน** | ใช้ MySQL transaction + `SELECT ... FOR UPDATE` row lock ในระหว่าง register |
 | **มาตรการแก้ไข** | ตรวจ registrations table, ยกเลิก registration ที่เกิน, แจ้งผู้ใช้ |
-| **Owner** | นักพัฒนา Backend |
+| **Owner** | Developer |
 | **สถานะ** | แก้ไขแล้ว (transaction ใน registerForEvent) |
 
 ---
@@ -88,7 +87,7 @@
 | **ระดับ** | 🟠 High |
 | **มาตรการป้องกัน** | กำหนด API response format มาตรฐานใน Coding_Standards.md, ทำ integration test |
 | **มาตรการแก้ไขแล้ว** | Code Review ร่วม Frontend+Backend ก่อน merge |
-| **Owner** | Team Lead |
+| **Owner** | QA / DevOps |
 | **สถานะ** | กำลังดำเนินการ |
 
 ---
@@ -103,7 +102,7 @@
 | **ระดับ** | 🟢 Low |
 | **มาตรการป้องกัน** | Frontend interceptor ตรวจ 401 และ redirect ไป login พร้อมข้อความแจ้ง |
 | **มาตรการแก้ไข** | เพิ่ม refresh token mechanism ในอนาคต |
-| **Owner** | นักพัฒนา Frontend |
+| **Owner** | QA / DevOps |
 | **สถานะ** | บางส่วนแล้ว (Axios interceptor) |
 
 ---
@@ -118,7 +117,7 @@
 | **ระดับ** | 🟠 High |
 | **มาตรการป้องกัน** | มี Docker Compose สำหรับ local run, เตรียม CI/CD pipeline |
 | **มาตรการแก้ไข** | Deploy บน Cloud platform (e.g., Railway, Render, VPS) |
-| **Owner** | DevOps |
+| **Owner** | QA / DevOps |
 | **สถานะ** | Backlog |
 
 ---

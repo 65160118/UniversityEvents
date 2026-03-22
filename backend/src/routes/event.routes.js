@@ -15,5 +15,7 @@ router.post(
 );
 router.post('/:eventId/register', requireAuth, requireRole(['STUDENT']), eventController.registerForEvent);
 router.patch('/:eventId/cancel-registration', requireAuth, requireRole(['STUDENT']), eventController.cancelRegistration);
+router.patch('/:eventId/check-in', requireAuth, requireRole(['LECTURER', 'ADMIN']), eventController.checkInAttendee);
+router.post('/:eventId/feedback', requireAuth, requireRole(['STUDENT']), eventController.submitFeedback);
 
 module.exports = router;

@@ -222,4 +222,42 @@ describe('event.controller', () => {
     expect(conn.commit).toHaveBeenCalled();
     expect(next).not.toHaveBeenCalled();
   });
+
+  test('checkInAttendee should check in registered user', async () => {
+    const queryMock = jest
+      .fn()
+      .mockResolvedValueOnce([[{ event_id: 1, approval_status: 'APPROVED' }]])
+      .mockResolvedValueOnce([[{ reg_id: 10, status: 'REGISTERED' }]])
+      .mockResolvedValueOnce([{}]);
+    const conn = mockConnection(queryMock);
+    db.getConnection.mockResolvedValueOnce(conn);
+
+    const req = { params: { eventId: '1' }, body: { userId: 5 }, user: { userId: 3 } };
+    const res = mockRes();
+    const next = jest.fn();
+
+    await eventController.checkInAttendee(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(conn.commit).toHaveBeenCalled();
+    expect(next).not.toHaveBeenCalled();
+  });
+
+  test('submitFeedback should create feedback successfully', async () => {
+    db.query
+      .mockResolvedValueOnce([[{ event_id: 1 }]])
+      .mockResolvedValueOnce([[{ reg_id: 10, status: 'REGISTERED', check_status: true }]])
+      .mockResolvedValueOnce([[]])
+      .mockResolvedValueOnce([{}]);
+
+    const req = { params: { eventId: '1' }, body: { rating: 4, comment: 'ดีมาก' }, user: { userId: 5 } };
+    const res = mockRes();
+    const next = jest.fn();
+
+    await eventController.submitFeedback(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(201);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ success: true }));
+    expect(next).not.toHaveBeenCalled();
+  });
 });

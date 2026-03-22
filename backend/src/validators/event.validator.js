@@ -22,8 +22,25 @@ const eventIdParamSchema = z.object({
   eventId: z.coerce.number().int().positive('รหัสกิจกรรมต้องเป็นจำนวนเต็มบวก'),
 });
 
+const checkInSchema = z.object({
+  userId: z.coerce.number().int().positive('รหัสผู้ใช้ต้องเป็นจำนวนเต็มบวก'),
+});
+
+const feedbackSchema = z.object({
+  rating: z
+    .number({
+      invalid_type_error: 'คะแนนต้องเป็นตัวเลขระหว่าง 1 ถึง 5',
+    })
+    .int('คะแนนต้องเป็นจำนวนเต็ม')
+    .min(1, 'คะแนนต้องไม่น้อยกว่า 1')
+    .max(5, 'คะแนนต้องไม่เกิน 5'),
+  comment: z.string().trim().max(1000, 'ความเห็นยาวเกินกำหนด').optional().default(''),
+});
+
 module.exports = {
   createEventSchema,
   updateApprovalSchema,
   eventIdParamSchema,
+  checkInSchema,
+  feedbackSchema,
 };

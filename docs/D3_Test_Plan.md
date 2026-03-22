@@ -1,45 +1,45 @@
-# D3 Test Plan — University Event Management System
+# D3 Test Plan — ระบบจัดการกิจกรรมมหาวิทยาลัย
 
-## 1. Test Objective
-- Verify core backend API behavior for authentication, event lifecycle, approvals, and student registration.
-- Ensure role-based authorization is enforced correctly.
-- Maintain automated regression safety net with coverage target >= 80% (scope: critical modules).
+## 1. วัตถุประสงค์การทดสอบ
+- ตรวจสอบพฤติกรรม API ฝั่ง backend สำหรับการยืนยันตัวตน (authentication), lifecycle ของกิจกรรม, การอนุมัติ, และการลงทะเบียนนักศึกษา
+- ยืนยันว่า authorization ตามบทบาท (role-based) ทำงานถูกต้อง
+- รักษา automated regression safety net โดยตั้งเป้าหมาย coverage ไม่น้อยกว่า 80% (scope: โมดูลสำคัญ)
 
-## 2. Scope
-- In scope:
-  - Unit tests: validators, JWT utility, role middleware.
-  - Integration tests: auth, events, approvals, registrations, health route.
-- Out of scope (D4+):
-  - Browser end-to-end UI automation.
-  - Load testing at production-scale traffic.
+## 2. ขอบเขต
+- in scope:
+  - unit tests: validators, JWT utility, role middleware
+  - integration tests: auth, events, approvals, registrations, health route
+- out of scope (D4+):
+  - browser end-to-end UI automation
+  - load testing ที่ระดับ production-scale traffic
 
-## 3. Test Types
-- Unit Testing (Jest)
-- Integration Testing (Jest + Supertest)
-- Static Lint Check (ESLint)
+## 3. ประเภทการทดสอบ
+- unit testing (Jest)
+- integration testing (Jest + Supertest)
+- static lint check (ESLint)
 
-## 4. Test Environment
+## 4. สภาพแวดล้อมการทดสอบ
 - Node.js: 20.x
-- Test runner: Jest 29
+- test runner: Jest 29
 - HTTP test client: Supertest
-- DB dependency in integration tests: mocked via Jest module mocks
+- DB dependency ใน integration tests: mocked ผ่าน Jest module mocks
 - OS: Windows / Ubuntu (GitHub Actions)
 
-## 5. Entry Criteria
-- Backend dependencies installed (`npm ci`)
-- Test scripts available in backend/package.json
-- Jest configuration ready (`backend/jest.config.js`)
+## 5. เงื่อนไขก่อนเริ่ม (Entry Criteria)
+- ติดตั้ง dependencies ฝั่ง backend แล้ว (`npm ci`)
+- มี test scripts ใน backend/package.json
+- คอนฟิก Jest พร้อมใช้งาน (`backend/jest.config.js`)
 
-## 6. Exit Criteria
-- All test suites pass
-- No blocking lint errors
-- Coverage report generated (`coverage/`)
-- Critical regression checks passed:
-  - Unauthorized requests return 401
-  - Forbidden role access returns 403
-  - Validation errors return 400
+## 6. เกณฑ์ปิดงาน (Exit Criteria)
+- test suite ทั้งหมดผ่าน
+- ไม่มี lint errors ที่บล็อค
+- สร้างรายงาน coverage แล้ว (`coverage/`)
+- ตรวจ regression สำคัญผ่าน:
+  - request ที่ไม่ผ่าน auth ต้องได้ 401
+  - เข้าถึงด้วย role ที่ไม่ได้รับอนุญาตต้องได้ 403
+  - validation errors ต้องได้ 400
 
-## 7. Test Execution Commands
+## 7. คำสั่งรันการทดสอบ
 ```bash
 cd backend
 npm run test:unit
@@ -48,14 +48,14 @@ npm run test:coverage
 npm run lint
 ```
 
-## 8. Risks and Mitigations
-- Risk: Integration tests coupled to real DB state
-  - Mitigation: mock DB module in integration suite.
-- Risk: false confidence on heavy SQL branches
-  - Mitigation: add repository/service layer tests with DB container in next phase.
+## 8. ความเสี่ยงและแนวทางลดผลกระทบ
+- ความเสี่ยง: integration tests พึ่งพาสถานะ DB จริง
+  - แนวทางลดผลกระทบ: mock DB module ใน integration suite
+- ความเสี่ยง: เกิด false confidence ใน SQL branch ที่ซับซ้อน
+  - แนวทางลดผลกระทบ: เพิ่ม repository/service layer tests ใช้ DB container ในเฟสถัดไป
 
-## 9. Deliverables
-- Test source files in `backend/tests/`
-- Jest config in `backend/jest.config.js`
-- Coverage artifacts in `coverage/`
-- D3 documentation set in `docs/`
+## 9. ผลลัพธ์ที่ส่งมอบ
+- ไฟล์ test ที่อยู่ใน `backend/tests/`
+- คอนฟิก Jest ที่ `backend/jest.config.js`
+- artifact coverage ใน `coverage/`
+- เอกสาร D3 ภายใน `docs/`

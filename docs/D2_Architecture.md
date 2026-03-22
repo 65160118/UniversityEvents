@@ -20,7 +20,7 @@
 - backend/src/validators: request validation (Zod)
 - backend/database/schema.sql: relational schema
 
-## 4. Request Flow (Example)
+## 4. Request Flow 
 1. ผู้ใช้ล็อกอินจาก Frontend
 2. Frontend ส่ง request ไป Backend API
 3. Backend ตรวจ token ผ่าน middleware

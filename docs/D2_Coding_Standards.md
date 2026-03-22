@@ -25,7 +25,7 @@
 ## 4. API Response Style
 - success response:
   - success: true
-  - message: string (ถ้ามี)
+  - message: string 
   - data: object/array
 - error response:
   - success: false
@@ -49,6 +49,3 @@
 - ต้องมี integration test สำหรับ API หลัก
 - coverage report ต้อง generate ได้จากคำสั่ง test:coverage
 
-## 8. Reference
-สำหรับรายละเอียดเต็ม ให้ดูเอกสารหลัก:
-- docs/Coding_Standards.md

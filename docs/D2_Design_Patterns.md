@@ -23,9 +23,6 @@
 - auth.validator.js
 - event.validator.js
 
-แนวคิด:
-- validate ก่อนเข้าธุรกิจ logic
-- ตัด invalid input ตั้งแต่ต้นทาง
 
 ## 4. Transaction Script Pattern (Registration flow)
 ในกรณีสมัคร/ยกเลิกกิจกรรม ใช้ transaction ภายใน controller เพื่อรักษาความถูกต้องของข้อมูล:

@@ -293,10 +293,150 @@ async function cancelRegistration(req, res, next) {
   }
 }
 
+async function checkInAttendee(req, res, next) {
+  let connection;
+
+  try {
+    const { eventId } = eventIdParamSchema.parse(req.params);
+    const { userId } = require('../validators/event.validator').checkInSchema.parse(req.body);
+
+    connection = await pool.getConnection();
+    await connection.beginTransaction();
+
+    const [eventRows] = await connection.query(
+      `SELECT event_id, creator_id, approval_status, event_status
+       FROM events
+       WHERE event_id = ?
+       LIMIT 1`,
+      [eventId],
+    );
+
+    if (eventRows.length === 0) {
+      throw new ApiError(404, 'ไม่พบกิจกรรม');
+    }
+
+    const event = eventRows[0];
+
+    if (event.approval_status !== 'APPROVED') {
+      throw new ApiError(409, 'กิจกรรมยังไม่ผ่านการอนุมัติ');
+    }
+
+    const [registrations] = await connection.query(
+      `SELECT reg_id, status FROM registrations
+       WHERE event_id = ? AND user_id = ?
+       LIMIT 1`,
+      [eventId, userId],
+    );
+
+    if (registrations.length === 0 || registrations[0].status !== 'REGISTERED') {
+      throw new ApiError(404, 'ไม่พบการลงทะเบียนสำหรับผู้ใช้รายนี้');
+    }
+
+    await connection.query(
+      `UPDATE registrations
+       SET check_status = TRUE, check_in_time = NOW()
+       WHERE reg_id = ?`,
+      [registrations[0].reg_id],
+    );
+
+    await connection.commit();
+
+    return res.status(200).json({
+      success: true,
+      message: 'เช็กชื่อผู้เข้าร่วมกิจกรรมสำเร็จ',
+    });
+  } catch (err) {
+    if (connection) {
+      await connection.rollback();
+    }
+
+    if (err.name === 'ZodError') {
+      return next(new ApiError(400, 'ข้อมูลไม่ถูกต้อง', err.issues));
+    }
+
+    return next(err);
+  } finally {
+    if (connection) {
+      connection.release();
+    }
+  }
+}
+
+async function submitFeedback(req, res, next) {
+  try {
+    const { eventId } = eventIdParamSchema.parse(req.params);
+    const payload = require('../validators/event.validator').feedbackSchema.parse(req.body);
+
+    const [eventRows] = await pool.query(
+      `SELECT event_id FROM events
+       WHERE event_id = ? AND approval_status = 'APPROVED'`,
+      [eventId],
+    );
+
+    if (eventRows.length === 0) {
+      throw new ApiError(404, 'ไม่พบกิจกรรมหรือกิจกรรมยังไม่อนุมัติ');
+    }
+
+    const [registrationRows] = await pool.query(
+      `SELECT reg_id, status, check_status FROM registrations
+       WHERE event_id = ? AND user_id = ? AND status = 'REGISTERED'`,
+      [eventId, req.user.userId],
+    );
+
+    if (registrationRows.length === 0) {
+      throw new ApiError(403, 'คุณยังไม่ได้ลงชื่อเข้าร่วมกิจกรรมนี้');
+    }
+
+    if (!registrationRows[0].check_status) {
+      throw new ApiError(403, 'ยังไม่สามารถส่งคำประเมินได้จนกว่าจะเช็กชื่อเข้าร่วมกิจกรรมแล้ว');
+    }
+
+    const [existingFeedback] = await pool.query(
+      `SELECT feedback_id FROM feedback
+       WHERE event_id = ? AND user_id = ?
+       LIMIT 1`,
+      [eventId, req.user.userId],
+    );
+
+    if (existingFeedback.length > 0) {
+      await pool.query(
+        `UPDATE feedback
+         SET rating = ?, comment_text = ?, created_at = NOW()
+         WHERE feedback_id = ?`,
+        [payload.rating, payload.comment, existingFeedback[0].feedback_id],
+      );
+
+      return res.status(200).json({
+        success: true,
+        message: 'แก้ไขความคิดเห็นหลังเข้าร่วมกิจกรรมสำเร็จ',
+      });
+    }
+
+    await pool.query(
+      `INSERT INTO feedback (user_id, event_id, rating, comment_text)
+       VALUES (?, ?, ?, ?)`,
+      [req.user.userId, eventId, payload.rating, payload.comment],
+    );
+
+    return res.status(201).json({
+      success: true,
+      message: 'ส่งคำประเมินหลังเข้าร่วมกิจกรรมสำเร็จ',
+    });
+  } catch (err) {
+    if (err.name === 'ZodError') {
+      return next(new ApiError(400, 'ข้อมูลไม่ถูกต้อง', err.issues));
+    }
+
+    return next(err);
+  }
+}
+
 module.exports = {
   createEvent,
   listApprovedEvents,
   listMyRegistrations,
   registerForEvent,
   cancelRegistration,
+  checkInAttendee,
+  submitFeedback,
 };
